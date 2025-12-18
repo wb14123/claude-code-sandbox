@@ -9,4 +9,4 @@ docker run -it \
   -w "$(pwd)" \
   -u "$(id -u):$(id -g)" \
   wb14123/claude-code:latest \
-  claude
+  claude "$@"
