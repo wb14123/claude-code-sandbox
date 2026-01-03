@@ -24,7 +24,7 @@ jobs:
 
       - name: Check for updates
         id: check
-        run: ./check-dependencies.sh
+        run: ./claude-code/check-dependencies.sh
 
       - name: Create or update issue
         if: steps.check.outputs.updates_found == 'true'
