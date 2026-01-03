@@ -1,73 +1,112 @@
+# Code Agent Sandbox
 
-# Claude Code Sandbox
+Run AI code agents in a Docker sandbox.
 
-Run Claude Code in a sandbox.
+Currently supports:
+- [Claude Code](https://github.com/anthropics/claude-code) - Anthropic's CLI coding agent
+- [Qwen Code](https://github.com/QwenLM/qwen-code) - Qwen's terminal-first coding agent
 
-Currently using Docker which provides reasonable isolation as long as there are no targeted attacks.
+Docker provides reasonable isolation as long as there are no targeted attacks.
 
 ## Prerequisites
 
 - Docker installed and running on your system
-- Claude Code Docker image: `wb14123/claude-code:latest`
+
+## Available Docker Images
+
+| Agent | Docker Image |
+|-------|-------------|
+| Claude Code | `wb14123/claude-code:latest` |
+| Qwen Code | `wb14123/qwen-code:latest` |
 
 ## Installation
 
-### Option 1: Clone the Repository
+### Clone the Repository
 
 ```bash
 git clone <repository-url>
 cd claude-code-sandbox
-chmod +x claude-code-wrapper
-```
-
-### Option 2: Download the Script Directly
-
-```bash
-curl -O <raw-url-to-claude-code-wrapper>
-chmod +x claude-code-wrapper
 ```
 
 ## Usage
 
-### Direct Execution
+### Claude Code
 
-You can run the wrapper script directly:
-
-```bash
-./claude-code-wrapper
-```
-
-### Set Up an Alias (Recommended)
-
-For easier access, add an alias to your shell configuration file (`~/.bashrc`, `~/.zshrc`, or similar):
+Run the wrapper script directly:
 
 ```bash
-alias claude='/path/to/claude-code-sandbox/claude-code-wrapper'
+./claude-code/claude-code-wrapper
 ```
 
-After adding the alias, reload your shell configuration:
+Or set up an alias in your shell configuration (`~/.bashrc`, `~/.zshrc`, etc.):
+
+```bash
+alias claude='/path/to/claude-code-sandbox/claude-code/claude-code-wrapper'
+```
+
+### Qwen Code
+
+Run the wrapper script directly:
+
+```bash
+./qwen-code/qwen-code-wrapper
+```
+
+Or set up an alias:
+
+```bash
+alias qwen='/path/to/claude-code-sandbox/qwen-code/qwen-code-wrapper'
+```
+
+After adding aliases, reload your shell configuration:
 
 ```bash
 source ~/.bashrc  # or source ~/.zshrc
 ```
 
-Now you can run Claude Code from anywhere:
-
-```bash
-claude
-```
-
 ## How It Works
 
-The wrapper script runs Claude Code inside a Docker container with the following features:
+The wrapper scripts run code agents inside Docker containers with the following features:
 
-- **Configuration persistence**: Mounts `~/.claude` and `~/.claude.json` to preserve your settings
-- **Working directory access**: Mounts your current working directory, allowing Claude Code to access your project files
+- **Configuration persistence**: Mounts agent config directories to preserve your settings
+- **Working directory access**: Mounts your current working directory, allowing agents to access your project files
 - **User permissions**: Runs as your current user to avoid permission issues with created/modified files
 - **Isolation**: Provides sandboxed execution environment for enhanced security
 
+## Building Images
+
+To build all Docker images:
+
+```bash
+./build.sh
+```
+
+To build a specific agent's image:
+
+```bash
+./claude-code/build.sh
+./qwen-code/build.sh
+```
+
+## Project Structure
+
+```
+.
+├── build.sh                     # Build all Docker images
+├── claude-code/
+│   ├── Dockerfile
+│   ├── build.sh
+│   ├── check-dependencies.sh
+│   └── claude-code-wrapper
+└── qwen-code/
+    ├── Dockerfile
+    ├── build.sh
+    ├── check-dependencies.sh
+    └── qwen-code-wrapper
+```
+
 ## Notes
 
-- The wrapper preserves your current working directory, so Claude Code can access files in the directory where you run it
-- All Claude Code configuration is stored in your home directory and persists across container runs
-- Files created or modified by Claude Code will have your user's ownership
+- The wrappers preserve your current working directory, so agents can access files in the directory where you run them
+- All agent configuration is stored in your home directory and persists across container runs
+- Files created or modified by agents will have your user's ownership

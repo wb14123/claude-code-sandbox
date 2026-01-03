@@ -13,6 +13,17 @@ jobs:
       issues: write
       contents: read
 
+    strategy:
+      fail-fast: false
+      matrix:
+        project:
+          - name: claude-code
+            title: "Claude Code Dependency Updates Available"
+            label: claude-code
+          - name: qwen-code
+            title: "Qwen Code Dependency Updates Available"
+            label: qwen-code
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,7 +35,7 @@ jobs:
 
       - name: Check for updates
         id: check
-        run: ./claude-code/check-dependencies.sh
+        run: ./${{ matrix.project.name }}/check-dependencies.sh
 
       - name: Create or update issue
         if: steps.check.outputs.updates_found == 'true'
@@ -33,24 +44,26 @@ jobs:
           UPDATE_MESSAGE: ${{ steps.check.outputs.update_message }}
           CURRENT_NODE: ${{ steps.check.outputs.current_node }}
           LATEST_NODE: ${{ steps.check.outputs.latest_node }}
-          PUBLISHED_CLAUDE: ${{ steps.check.outputs.published_claude_code }}
-          LATEST_CLAUDE: ${{ steps.check.outputs.latest_claude_code }}
+          PROJECT_NAME: ${{ matrix.project.name }}
+          ISSUE_TITLE: ${{ matrix.project.title }}
+          ISSUE_LABEL: ${{ matrix.project.label }}
         with:
           script: |
-            const title = 'Dependency Updates Available';
+            const title = process.env.ISSUE_TITLE;
+            const projectName = process.env.PROJECT_NAME;
+            const issueLabel = process.env.ISSUE_LABEL;
             const body = `${process.env.UPDATE_MESSAGE}
 
             ---
 
             **Action Items:**
             1. Review the updates above
-            2. Update the \`Dockerfile\` if needed
+            2. Update the \`${projectName}/Dockerfile\` if needed
             3. Build and test the new image
             4. Push the updated image to Docker Hub
 
             **Automated Check Details:**
             - Node.js: Current \`${process.env.CURRENT_NODE}\` → Latest \`${process.env.LATEST_NODE}\`
-            - Claude Code: Published \`${process.env.PUBLISHED_CLAUDE}\` → Latest \`${process.env.LATEST_CLAUDE}\`
 
             This issue was automatically created by the dependency check workflow.`;
 
@@ -59,7 +72,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              labels: ['dependencies', 'automated']
+              labels: ['dependencies', 'automated', issueLabel]
             });
 
             const existingIssue = issues.data.find(issue => issue.title === title);
@@ -80,7 +93,7 @@ jobs:
                 repo: context.repo.repo,
                 title: title,
                 body: body,
-                labels: ['dependencies', 'automated']
+                labels: ['dependencies', 'automated', issueLabel]
               });
               console.log(`Created new issue #${newIssue.data.number}`);
             }
@@ -88,16 +101,20 @@ jobs:
       - name: Close issue if no updates
         if: steps.check.outputs.updates_found == 'false'
         uses: actions/github-script@v7
+        env:
+          ISSUE_TITLE: ${{ matrix.project.title }}
+          ISSUE_LABEL: ${{ matrix.project.label }}
         with:
           script: |
-            const title = 'Dependency Updates Available';
+            const title = process.env.ISSUE_TITLE;
+            const issueLabel = process.env.ISSUE_LABEL;
 
             // Check if an issue exists
             const issues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              labels: ['dependencies', 'automated']
+              labels: ['dependencies', 'automated', issueLabel]
             });
 
             const existingIssue = issues.data.find(issue => issue.title === title);

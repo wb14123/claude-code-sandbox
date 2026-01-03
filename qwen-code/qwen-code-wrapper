@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -e
+
+docker run -it \
+  -v ~/.qwen:/home/node/.qwen \
+  -v "$(pwd)":"$(pwd)" \
+  -w "$(pwd)" \
+  -u "$(id -u):$(id -g)" \
+  wb14123/qwen-code:latest \
+  qwen "$@"
