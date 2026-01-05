@@ -5,6 +5,7 @@ set -e
 docker run -it \
   -v ~/.claude:/home/node/.claude \
   -v ~/.claude.json:/home/node/.claude.json \
+  -v ~/.cargo:/home/node/.cargo \
   -v "$(pwd)":"$(pwd)" \
   -w "$(pwd)" \
   -u "$(id -u):$(id -g)" \
