@@ -19,4 +19,8 @@ echo "=== Building Qwen Code ==="
 "$SCRIPT_DIR/qwen-code/build.sh"
 
 echo ""
+echo "=== Building OpenCode ==="
+"$SCRIPT_DIR/opencode/build.sh"
+
+echo ""
 echo "All images built and pushed successfully!"

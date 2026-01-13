@@ -26,6 +26,9 @@ jobs:
           - name: qwen-code
             title: "Qwen Code Dependency Updates Available"
             label: qwen-code
+          - name: opencode
+            title: "OpenCode Dependency Updates Available"
+            label: opencode
 
     steps:
       - name: Checkout repository

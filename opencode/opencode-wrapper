@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+# Ensure config/data directories exist on host
+mkdir -p ~/.config/opencode
+mkdir -p ~/.local/share/opencode
+mkdir -p ~/.local/state/opencode
+
+docker run -it \
+  -v ~/.config/opencode:/home/node/.config/opencode \
+  -v ~/.local/share:/home/node/.local/share \
+  -v ~/.local/state:/home/node/.local/state \
+  -v ~/.cargo:/home/node/.cargo \
+  -v "$(pwd)":"$(pwd)" \
+  -w "$(pwd)" \
+  -u "$(id -u):$(id -g)" \
+  wb14123/opencode:latest \
+  opencode "$@"
