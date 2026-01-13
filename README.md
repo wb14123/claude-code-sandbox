@@ -5,6 +5,7 @@ Run AI code agents in a Docker sandbox.
 Currently supports:
 - [Claude Code](https://github.com/anthropics/claude-code) - Anthropic's CLI coding agent
 - [Qwen Code](https://github.com/QwenLM/qwen-code) - Qwen's terminal-first coding agent
+- [OpenCode](https://github.com/anomalyco/opencode) - Terminal-first AI coding agent
 
 Docker provides reasonable isolation as long as there are no targeted attacks.
 
@@ -18,6 +19,7 @@ Docker provides reasonable isolation as long as there are no targeted attacks.
 |-------|-------------|
 | Claude Code | `wb14123/claude-code:latest` |
 | Qwen Code | `wb14123/qwen-code:latest` |
+| OpenCode | `wb14123/opencode:latest` |
 
 ## Installation
 
@@ -58,6 +60,20 @@ Or set up an alias:
 alias qwen='/path/to/claude-code-sandbox/qwen-code/qwen-code-wrapper'
 ```
 
+### OpenCode
+
+Run the wrapper script directly:
+
+```bash
+./opencode/opencode-wrapper
+```
+
+Or set up an alias:
+
+```bash
+alias opencode='/path/to/claude-code-sandbox/opencode/opencode-wrapper'
+```
+
 After adding aliases, reload your shell configuration:
 
 ```bash
@@ -86,6 +102,7 @@ To build a specific agent's image:
 ```bash
 ./claude-code/build.sh
 ./qwen-code/build.sh
+./opencode/build.sh
 ```
 
 ## Project Structure
@@ -98,11 +115,16 @@ To build a specific agent's image:
 │   ├── build.sh
 │   ├── check-dependencies.sh
 │   └── claude-code-wrapper
-└── qwen-code/
+├── qwen-code/
+│   ├── Dockerfile
+│   ├── build.sh
+│   ├── check-dependencies.sh
+│   └── qwen-code-wrapper
+└── opencode/
     ├── Dockerfile
     ├── build.sh
     ├── check-dependencies.sh
-    └── qwen-code-wrapper
+    └── opencode-wrapper
 ```
 
 ## Notes
