@@ -7,6 +7,10 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 echo "Building all Docker images..."
 
 echo ""
+echo "=== Building Base Image ==="
+"$SCRIPT_DIR/base-image/build.sh"
+
+echo ""
 echo "=== Building Claude Code ==="
 "$SCRIPT_DIR/claude-code/build.sh"
 

@@ -17,6 +17,9 @@ jobs:
       fail-fast: false
       matrix:
         project:
+          - name: base-image
+            title: "Base Image Dependency Updates Available"
+            label: base-image
           - name: claude-code
             title: "Claude Code Dependency Updates Available"
             label: claude-code
