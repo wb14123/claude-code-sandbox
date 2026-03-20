@@ -42,7 +42,28 @@ else
   fi
 fi
 
-# 2. Check Rust toolchain version
+# 2. Check Scala version
+echo "## Checking Scala version..."
+CURRENT_SCALA_VERSION="2.13.18"
+
+LATEST_SCALA_213=$(curl -s "https://api.github.com/repos/scala/scala/releases" | \
+  jq -r '.[].tag_name' | grep '^v2\.13\.' | sed 's/^v//' | sort -V | tail -n1 || echo "")
+
+if [ -z "$LATEST_SCALA_213" ]; then
+  echo "WARNING: Could not fetch latest Scala 2.13 version"
+else
+  echo "Current Scala version: $CURRENT_SCALA_VERSION"
+  echo "Latest Scala 2.13 version: $LATEST_SCALA_213"
+
+  if [ "$LATEST_SCALA_213" != "$CURRENT_SCALA_VERSION" ]; then
+    UPDATES_FOUND=true
+    UPDATE_MESSAGE="${UPDATE_MESSAGE}### Scala Update Available\n"
+    UPDATE_MESSAGE="${UPDATE_MESSAGE}- Current: \`$CURRENT_SCALA_VERSION\`\n"
+    UPDATE_MESSAGE="${UPDATE_MESSAGE}- Latest: \`$LATEST_SCALA_213\`\n\n"
+  fi
+fi
+
+# 3. Check Rust toolchain version
 echo "## Checking Rust toolchain..."
 
 # Get latest stable Rust version
@@ -59,7 +80,7 @@ else
   echo "Latest Rust version: $LATEST_RUST"
 fi
 
-# 3. Check published base image
+# 4. Check published base image
 echo "## Checking published base image..."
 
 if ! docker pull wb14123/coding-agent-base:latest 2>/dev/null; then
@@ -79,9 +100,23 @@ else
       UPDATE_MESSAGE="${UPDATE_MESSAGE}- Latest stable version: \`$LATEST_RUST\`\n\n"
     fi
   fi
+
+  # Get Scala version from the published image
+  PUBLISHED_SCALA=$(docker run --rm wb14123/coding-agent-base:latest scala -version 2>&1 | grep -oP 'version \K[0-9.]+' || echo "")
+
+  if [ -n "$PUBLISHED_SCALA" ]; then
+    echo "Scala version in published image: $PUBLISHED_SCALA"
+
+    if [ -n "$LATEST_SCALA_213" ] && [ "$PUBLISHED_SCALA" != "$LATEST_SCALA_213" ]; then
+      UPDATES_FOUND=true
+      UPDATE_MESSAGE="${UPDATE_MESSAGE}### Scala Update Available\n"
+      UPDATE_MESSAGE="${UPDATE_MESSAGE}- Published image version: \`$PUBLISHED_SCALA\`\n"
+      UPDATE_MESSAGE="${UPDATE_MESSAGE}- Latest 2.13 version: \`$LATEST_SCALA_213\`\n\n"
+    fi
+  fi
 fi
 
-# 4. Check Node.js image digest to detect base image updates
+# 5. Check Node.js image digest to detect base image updates
 echo "## Checking for base image updates (same version)..."
 CURRENT_NODE_DIGEST=$(docker pull node:${CURRENT_NODE_VERSION}-bookworm 2>&1 | grep -oP 'Digest: \K[a-z0-9:]+' || echo "")
 
@@ -129,6 +164,9 @@ if [ -n "$GITHUB_OUTPUT" ]; then
   echo "latest_node=${LATEST_NODE_VERSION:-unknown}" >> "$GITHUB_OUTPUT"
   echo "latest_rust=${LATEST_RUST:-unknown}" >> "$GITHUB_OUTPUT"
   echo "published_rust=${PUBLISHED_RUST:-unknown}" >> "$GITHUB_OUTPUT"
+  echo "current_scala=${CURRENT_SCALA_VERSION:-unknown}" >> "$GITHUB_OUTPUT"
+  echo "latest_scala=${LATEST_SCALA_213:-unknown}" >> "$GITHUB_OUTPUT"
+  echo "published_scala=${PUBLISHED_SCALA:-unknown}" >> "$GITHUB_OUTPUT"
 fi
 
 echo ""
@@ -137,3 +175,6 @@ echo "- Current Node.js: ${CURRENT_NODE_VERSION:-unknown}"
 echo "- Latest Node.js: ${LATEST_NODE_VERSION:-unknown}"
 echo "- Published Rust: ${PUBLISHED_RUST:-unknown}"
 echo "- Latest Rust: ${LATEST_RUST:-unknown}"
+echo "- Current Scala: ${CURRENT_SCALA_VERSION:-unknown}"
+echo "- Latest Scala 2.13: ${LATEST_SCALA_213:-unknown}"
+echo "- Published Scala: ${PUBLISHED_SCALA:-unknown}"

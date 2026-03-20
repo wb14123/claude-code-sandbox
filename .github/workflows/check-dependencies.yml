@@ -20,9 +20,6 @@ jobs:
           - name: base-image
             title: "Base Image Dependency Updates Available"
             label: base-image
-          - name: claude-code
-            title: "Claude Code Dependency Updates Available"
-            label: claude-code
           - name: qwen-code
             title: "Qwen Code Dependency Updates Available"
             label: qwen-code

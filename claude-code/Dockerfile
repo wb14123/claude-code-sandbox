@@ -1,3 +1,6 @@
 FROM wb14123/coding-agent-base:latest
 
-RUN npm install -g @anthropic-ai/claude-code@2.1.63
+ARG CLAUDE_VERSION=2.1.80
+
+RUN curl -fsSL https://claude.ai/install.sh | bash -s ${CLAUDE_VERSION} && \
+    mv /root/.local/bin/claude /usr/local/bin/claude

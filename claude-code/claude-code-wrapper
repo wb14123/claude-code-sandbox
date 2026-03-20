@@ -10,5 +10,6 @@ docker run -it \
   -w "$(pwd)" \
   -u "$(id -u):$(id -g)" \
   -e CARGO_TARGET_DIR=./target-docker \
+  --entrypoint /usr/local/bin/claude \
   wb14123/claude-code:latest \
-  claude "$@"
+  "$@"
